@@ -28,7 +28,7 @@ public class Level : MonoBehaviour
         Library.GetOrCreate(cells, pos).Add(obj);
     }
 
-    public void RemoveObject(GameObject obj)
+    public static Vector2Int ObjectPosition(GameObject obj)
     {
         var cell = obj.GetComponent<Cell>();
         if (cell == null)
@@ -36,17 +36,32 @@ public class Level : MonoBehaviour
             throw new Exception("Game object" + obj.name + " is not from level grid");
         }
 
-        var pos = cell.ToVec();
+        return cell.ToVec();
+    }
+
+    public void RemoveObject(GameObject obj)
+    {
+        var pos = ObjectPosition(obj);
+        
         var list = cells[pos];
         list.Remove(obj);
+        Destroy(obj);
         if (list.Count == 0)
         {
             cells.Remove(pos);
         }
     }
 
-    public void MoveObject(GameObject obj, Vector2Int from, Vector2Int to)
+    public void MoveObject(GameObject obj, Vector2Int to)
     {
+        var cell = obj.GetComponent<Cell>();
+        if (cell == null)
+        {
+            throw new Exception("Game object" + obj.name + " is not from level grid");
+        }
+
+        var from = cell.ToVec();
+        
         if (!cells.TryGetValue(from, out var fromObjects))
         {
             throw new Exception("Cell " + from + " doesn't exist");
@@ -60,6 +75,8 @@ public class Level : MonoBehaviour
         }
 
         ToWorldCoords(from, to, obj);
+        cell.x = to.x;
+        cell.y = to.y;
         toObjects.Add(obj);
     }
 
