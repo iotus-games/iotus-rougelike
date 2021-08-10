@@ -5,9 +5,14 @@ using UnityEngine.Assertions;
 public class TestLevel : MonoBehaviour
 {
     //public GameObject levelObject;
-    public GameObject testObject = null;
-    public GameObject testCell = null;
-    public Level level = null;
+    public GameObject testObject;
+    public GameObject testCell;
+    public GameObject testPlayer;
+    public GameObject testCamera;
+    public InfoMessage logger;
+    public Location location;
+    public StepState stepState;
+    public float cameraHeight;
 
     void Start()
     {
@@ -24,27 +29,40 @@ public class TestLevel : MonoBehaviour
                 for (var j = 0; j < height; j++)
                 {
                     cellCount += 1;
-                    level.AddObject(new Vector2Int(i, j), testCell);
+                    var ground = location.AddObject(new Vector2Int(i, j), testCell);
+                    ground.AddComponent<GroundTag>();
                     if (i % 3 == 0 && j % 3 == 0)
                     {
                         cubesCount += 1;
-                        level.AddObject(new Vector2Int(i, j), testObject);
+                        var obstacle = location.AddObject(new Vector2Int(i, j), testObject);
+                        obstacle.AddComponent<ObstacleTag>();
                     }
                 }
             }
 
-            var objects = level.QueryArea(
+            var player = location.AddObject(new Vector2Int(5, 5), testPlayer);
+            var controller = player.AddComponent<PlayerController>();
+            controller.location = location;
+            controller.stepState = stepState;
+            controller.player = player;
+            controller.playerCamera = testCamera;
+            controller.cameraHeight = cameraHeight;
+            controller.logger = logger;
+            stepState.AddStepObject(player);
+
+            var objects = location.QueryArea(
                 new Vector2Int(0, 0),
                 new Vector2Int(width, height),
                 typeof(Cell));
 
-            Assert.AreEqual(objects.Count, cellCount + cubesCount);
+            Assert.AreEqual(objects.Count, cellCount + cubesCount + 1);
 
             var someObject = objects[0];
             var offset = new Vector2Int(10, -5);
-            var newPosition = Level.ObjectPosition(someObject) + offset;
-            level.MoveObject(someObject, newPosition);
-            Assert.AreEqual(Level.ObjectPosition(someObject), newPosition);
+            var cell = someObject.GetComponent<Cell>();
+            var newPosition = cell.ToVec() + offset;
+            location.MoveObject(someObject, cell,  newPosition);
+            Assert.AreEqual(cell.ToVec(), newPosition);
         }
         catch (Exception e)
         {
