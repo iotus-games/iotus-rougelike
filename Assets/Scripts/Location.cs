@@ -5,20 +5,14 @@ using UnityEngine.Assertions;
 
 // Положительное направление по X: право
 // Положительное направление по Y: низ
-public class Level : MonoBehaviour
+public class Location : MonoBehaviour
 {
     public float sellSize = 1;
 
-    public void ToWorldCoords(Vector2Int oldPos, Vector2Int newPos, GameObject obj)
-    {
-        var gridFrom = (Vector2) oldPos * sellSize;
-        var gridTo = (Vector2) newPos * sellSize;
-        var position = obj.transform.position;
-        obj.transform.position = new Vector3(
-            gridTo.x + position.x - gridFrom.x, position.y, gridTo.y + position.z - gridFrom.y);
-    }
 
-    public void AddObject(Vector2Int pos, GameObject prefab)
+    // Добавляет объект на сетку уровня.
+    // Компонент Transform определяет положение объекта относительно центра клетки.
+    public GameObject AddObject(Vector2Int pos, GameObject prefab)
     {
         var obj = Instantiate(prefab);
         ToWorldCoords(new Vector2Int(), pos, obj);
@@ -26,23 +20,14 @@ public class Level : MonoBehaviour
         cell.x = pos.x;
         cell.y = pos.y;
         Library.GetOrCreate(cells, pos).Add(obj);
+        return obj;
     }
 
-    public static Vector2Int ObjectPosition(GameObject obj)
-    {
-        var cell = obj.GetComponent<Cell>();
-        if (cell == null)
-        {
-            throw new Exception("Game object" + obj.name + " is not from level grid");
-        }
-
-        return cell.ToVec();
-    }
-
+    // Удаляет объект, находящийся на сетке уровня
     public void RemoveObject(GameObject obj)
     {
-        var pos = ObjectPosition(obj);
-        
+        var pos = obj.GetComponent<Cell>().ToVec();
+
         var list = cells[pos];
         list.Remove(obj);
         Destroy(obj);
@@ -52,16 +37,11 @@ public class Level : MonoBehaviour
         }
     }
 
-    public void MoveObject(GameObject obj, Vector2Int to)
+    // Мгновнно перемещает с клетки на клетку
+    public void MoveObject(GameObject obj, Cell cell, Vector2Int to)
     {
-        var cell = obj.GetComponent<Cell>();
-        if (cell == null)
-        {
-            throw new Exception("Game object" + obj.name + " is not from level grid");
-        }
-
         var from = cell.ToVec();
-        
+
         if (!cells.TryGetValue(from, out var fromObjects))
         {
             throw new Exception("Cell " + from + " doesn't exist");
@@ -78,6 +58,45 @@ public class Level : MonoBehaviour
         cell.x = to.x;
         cell.y = to.y;
         toObjects.Add(obj);
+    }
+
+    // Проверяет, есть ли объект со всеми нужными компоентами в клетке
+    public bool Has(Vector2Int pos, List<Type> components)
+    {
+        if (cells.TryGetValue(pos, out var objects))
+        {
+            foreach (var obj in objects)
+            {
+                var hasAll = true;
+                foreach (var component in components)
+                {
+                    if (obj.GetComponent(component) == null)
+                    {
+                        hasAll = false;
+                        break;
+                    }
+                }
+
+                if (hasAll)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Проверяет, есть ли объект с нужным компоентом в клетке
+    public bool Has(Vector2Int pos, Type component)
+    {
+        var a = new List<Type> {component};
+        return Has(pos, a);
+    }
+
+    // Проверяет, есть ли объекты в клетке
+    public bool Has(Vector2Int pos)
+    {
+        return cells.ContainsKey(pos);
     }
 
     // Возвращает объекты в клетке, содержащие все перечисленные компоненты
@@ -126,23 +145,7 @@ public class Level : MonoBehaviour
         return Query(pos, a);
     }
 
-    // Найти объект на уровне по имени
-    public GameObject Query(string objName)
-    {
-        foreach (var list in cells.Values)
-        {
-            foreach (var obj in list)
-            {
-                if (obj.name == objName)
-                {
-                    return obj;
-                }
-            }
-        }
-
-        return null;
-    }
-
+    // Возвращает объекты на прямоугольной площади, содержащие все перечисленные компоненты
     public List<GameObject> QueryArea(Vector2Int leftTop, Vector2Int rightBottom, List<Type> components)
     {
         var result = new List<GameObject>();
@@ -159,16 +162,27 @@ public class Level : MonoBehaviour
         return result;
     }
 
+    // Возвращает объекты на прямоугольной площади, содержащие указанный компонент
     public List<GameObject> QueryArea(Vector2Int leftTop, Vector2Int rightBot, Type component)
     {
         var a = new List<Type> {component};
         return QueryArea(leftTop, rightBot, a);
     }
 
+    // Возвращает все объекты на прямоугольной площади
     public List<GameObject> QueryArea(Vector2Int leftTop, Vector2Int rightBot)
     {
         var a = new List<Type>();
         return QueryArea(leftTop, rightBot, a);
+    }
+
+    private void ToWorldCoords(Vector2Int oldPos, Vector2Int newPos, GameObject obj)
+    {
+        var gridFrom = (Vector2) oldPos * sellSize;
+        var gridTo = (Vector2) newPos * sellSize;
+        var position = obj.transform.position;
+        obj.transform.position = new Vector3(
+            gridTo.x + position.x - gridFrom.x, position.y, gridTo.y + position.z - gridFrom.y);
     }
 
     private Dictionary<Vector2, List<GameObject>> cells = new Dictionary<Vector2, List<GameObject>>();
