@@ -1,30 +1,24 @@
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IStepSystem
 {
     public Location location;
-    public StepState stepState;
     public GameObject player;
     public GameObject playerCamera;
     public float cameraHeight;
-    public InfoMessage logger;
     private Cell playerCell;
 
     void Start()
     {
         playerCell = player.GetComponent<Cell>();
-        stepState.AddStepObject(player);
         var pos = transform.position;
         playerCamera.transform.position = new Vector3(pos.x, cameraHeight, pos.z);
         playerCamera.transform.Rotate(90, 0, 0);
     }
 
-    void Update()
+    public StepResult Step()
     {
-        if (player != stepState.CurrentStepObject())
-        {
-            return;
-        }
+        var result = new StepResult(StepAction.Wait);
 
         Vector2Int? newPos = null;
 
@@ -65,24 +59,27 @@ public class PlayerController : MonoBehaviour
             newPos = playerCell.ToVec() + Vector2Int.down + Vector2Int.right;
         }
 
-        if (!newPos.HasValue) return;
+        if (!newPos.HasValue)
+        {
+            return result;
+        }
 
         if (location.Has(newPos.Value, typeof(ObstacleTag)))
         {
-            logger.Message("Can't move, obstacle at " + newPos.Value);
-            return;
+            return result.Message("Can't move, obstacle at " + newPos.Value, MessageType.Error);
         }
 
         if (!location.Has(newPos.Value, typeof(GroundTag)))
         {
-            logger.Message("Can't move, no ground at " + newPos.Value);
-            return;
+            return result.Message("Can't move, no ground at " + newPos.Value, MessageType.Error);
         }
 
         location.MoveObject(player, playerCell, newPos.Value);
 
         var pos = transform.position;
         playerCamera.transform.position = new Vector3(pos.x, cameraHeight, pos.z);
-        stepState.NextStep();
+
+        result.Action = StepAction.Continue;
+        return result;
     }
 }

@@ -2,14 +2,13 @@ using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class TestLevel : MonoBehaviour
+public class LevelGenerator : MonoBehaviour
 {
     //public GameObject levelObject;
     public GameObject testObject;
     public GameObject testCell;
     public GameObject testPlayer;
     public GameObject testCamera;
-    public InfoMessage logger;
     public Location location;
     public StepState stepState;
     public float cameraHeight;
@@ -43,12 +42,13 @@ public class TestLevel : MonoBehaviour
             var player = location.AddObject(new Vector2Int(5, 5), testPlayer);
             var controller = player.AddComponent<PlayerController>();
             controller.location = location;
-            controller.stepState = stepState;
             controller.player = player;
             controller.playerCamera = testCamera;
             controller.cameraHeight = cameraHeight;
-            controller.logger = logger;
-            stepState.AddStepObject(player);
+            
+            var pipeline = player.AddComponent<StepPipeline>();
+            pipeline.StepSystems.Add(controller);
+            stepState.stepObjects.Add(pipeline);
 
             var objects = location.QueryArea(
                 new Vector2Int(0, 0),
