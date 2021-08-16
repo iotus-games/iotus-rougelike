@@ -449,7 +449,7 @@ MonoBehaviour:
   testCell: {fileID: 1547219063510175250, guid: 81c1c8f0f0e80b94b85b64c8dd3a66f3, type: 3}
   testPlayer: {fileID: 6070056235653427683, guid: 36f43bb77bfd2ed44a29a0eb32ee80c9, type: 3}
   testCamera: {fileID: 1035664842}
-  logger: {fileID: 1071213772}
+  testEnemy: {fileID: 4541059010116781132, guid: 79452c86a99d63947b080cc0ffe7c635, type: 3}
   location: {fileID: 1071213768}
   stepState: {fileID: 1071213771}
   cameraHeight: 7
@@ -479,6 +479,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8fa11ba67aefd940b78960c224b7ff7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  location: {fileID: 1071213768}
   logger: {fileID: 1071213772}
 --- !u!114 &1071213772
 MonoBehaviour:
@@ -496,6 +497,7 @@ MonoBehaviour:
   messagePrefab: {fileID: 4137154984747111801, guid: 562f8379252865446ae2b0eef423623c, type: 3}
   messageStride: 0.22
   maxMessages: 5
+  filterTypes: 0000000001000000020000000300000004000000
 --- !u!1 &1647018837
 GameObject:
   m_ObjectHideFlags: 0

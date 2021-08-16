@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -13,19 +12,13 @@ public enum MessageType
     Step,
 }
 
-public struct MessageInfo
+struct MessageInfo
 {
-    public MessageInfo(string text, MessageType type)
-    {
-        Text = text;
-        Type = type;
-    }
-
     public MessageType Type;
     public string Text;
 }
 
-public class InfoMessage : MonoBehaviour
+public class LogState : MonoBehaviour
 {
     public GameObject gameCamera;
     public GameObject messagePrefab;
@@ -35,7 +28,7 @@ public class InfoMessage : MonoBehaviour
 
     private List<TextMeshPro> messages = new List<TextMeshPro>();
     private List<MessageInfo> messageInfos = new List<MessageInfo>();
-    private int historyPosition = 0;
+    private int historyPosition;
 
     private void Start()
     {
