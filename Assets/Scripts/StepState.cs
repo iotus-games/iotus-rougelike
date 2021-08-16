@@ -1,72 +1,26 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum StepAction
+struct StepInfo
 {
-    Continue,
-    Wait,
+    public GameObject Object;
+    public IStepSystem System;
 }
 
-public struct StepResult
-{
-    public StepAction Action;
-    public List<MessageInfo> Messages;
-
-    public StepResult(StepAction action)
-    {
-        Action = action;
-        Messages = new List<MessageInfo>();
-    }
-
-    public StepResult Message(string text, MessageType type)
-    {
-        Messages.Add(new MessageInfo(text, type));
-        return this;
-    }
-}
-
-public interface IStepSystem
-{
-    StepResult Step();
-}
-
-public class StepPipeline : MonoBehaviour
-{
-    public StepResult Step()
-    {
-        var result = StepSystems[currentSystem].Step();
-
-        if (result.Action == StepAction.Continue)
-        {
-            currentSystem += 1;
-            if (currentSystem == StepSystems.Count)
-            {
-                currentSystem = 0;
-                result.Action = StepAction.Continue;
-            }
-        }
-
-        return result;
-    }
-
-    public List<IStepSystem> StepSystems = new List<IStepSystem>();
-    private int currentSystem = 0;
-}
-
+// Последовательно выполняет ходы всех юнитов на уровне
 public class StepState : MonoBehaviour
 {
     public void Update()
     {
-        var result = stepObjects[currentUnit].Step();
+        var result = stepObjects[currentUnit].System.Step(logger, location);
 
         if (stepBegin)
         {
-            logger.Message("Step unit: " + gameObject.name, MessageType.Step);
+            logger.Message("Step unit: " + stepObjects[currentUnit].Object.name, MessageType.Step);
             stepBegin = false;
         }
 
-        if (result.Action == StepAction.Continue)
+        if (result == StepAction.Continue)
         {
             currentUnit += 1;
             stepBegin = true;
@@ -76,15 +30,29 @@ public class StepState : MonoBehaviour
                 currentUnit = 0;
             }
         }
+    }
 
-        foreach (var message in result.Messages)
+    public void AddStepObject(GameObject obj)
+    {
+        stepObjects.Add(new StepInfo{Object = obj, System = obj.GetComponent<IStepSystem>()});
+    }
+
+    public void RemoveStepObject(GameObject obj)
+    {
+        for (int i = 0; i < stepObjects.Count; i++)
         {
-            logger.Message(message.Text, message.Type);
+            if (stepObjects[i].Object == obj)
+            {
+                stepObjects.RemoveAt(i);
+                break;
+            }
         }
     }
 
-    public InfoMessage logger;
-    public List<StepPipeline> stepObjects;
+    public Location location;
+    public LogState logger;
+    
+    private List<StepInfo> stepObjects = new List<StepInfo>();
     private int currentUnit;
     private bool stepBegin = true;
 }
