@@ -40,6 +40,7 @@ public class LevelGenerator : MonoBehaviour
         var enemy = location.AddObject(new Vector2Int(0, 1), testEnemy);
         var ai = enemy.AddComponent<SimpleAI>();
         ai.targetPlayer = player;
+        ai.visionDistance = 4;
         stepState.AddStepObject(enemy);
 
         var objects = location.QueryArea(
