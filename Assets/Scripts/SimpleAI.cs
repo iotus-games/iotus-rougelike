@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class SimpleAI : MonoBehaviour, IStepSystem
 {
     public GameObject targetPlayer;
+    public uint visionDistance;
     private Cell targetCell;
     private Cell aiCell;
 
@@ -15,10 +17,18 @@ public class SimpleAI : MonoBehaviour, IStepSystem
 
     public StepAction Step(LogState logger, Location location)
     {
-        var to = BreathFirstSearchStep(location, aiCell.ToVec(), targetCell.ToVec());
-        if (to != targetCell.ToVec())
+        var aiPos = aiCell.ToVec();
+        var targetPos = targetCell.ToVec();
+
+        var xDistance = Math.Abs(aiPos.x - targetPos.x);
+        var yDistance = Math.Abs(aiPos.y - targetPos.y);
+        if (xDistance < visionDistance && yDistance < visionDistance)
         {
-            location.MoveObject(gameObject, aiCell, to);
+            var to = BreathFirstSearchStep(location, aiPos, targetPos);
+            if (to != targetCell.ToVec())
+            {
+                location.MoveObject(gameObject, aiCell, to);
+            }
         }
 
         return StepAction.Continue;
