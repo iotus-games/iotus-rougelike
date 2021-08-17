@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-struct StepInfo
+public struct StepInfo
 {
     public GameObject Object;
     public IStepSystem System;
@@ -10,49 +9,40 @@ struct StepInfo
 // Последовательно выполняет ходы всех юнитов на уровне
 public class StepState : MonoBehaviour
 {
-    public void Update()
+    public void Awake()
     {
-        var result = stepObjects[currentUnit].System.Step(logger, location);
+        pipeline = gameObject.AddComponent<StepPipeline>();
+    }
 
+    private void Update()
+    {
         if (stepBegin)
         {
-            logger.Message("Step unit: " + stepObjects[currentUnit].Object.name, MessageType.Step);
+            logger.Message("Step unit: " + pipeline.CurrentStepObject().name, MessageType.Step);
             stepBegin = false;
         }
 
+        var result = pipeline.Step(logger, location);
+
         if (result == StepAction.Continue)
         {
-            currentUnit += 1;
             stepBegin = true;
-
-            if (currentUnit == stepObjects.Count)
-            {
-                currentUnit = 0;
-            }
         }
     }
 
-    public void AddStepObject(GameObject obj)
+    public void AddStepSystem(GameObject obj)
     {
-        stepObjects.Add(new StepInfo{Object = obj, System = obj.GetComponent<IStepSystem>()});
+        pipeline.AddStepSystem(obj);
     }
 
-    public void RemoveStepObject(GameObject obj)
+    public void RemoveStepSystem(GameObject obj)
     {
-        for (int i = 0; i < stepObjects.Count; i++)
-        {
-            if (stepObjects[i].Object == obj)
-            {
-                stepObjects.RemoveAt(i);
-                break;
-            }
-        }
+        pipeline.RemoveStepSystem(obj);
     }
 
     public Location location;
     public LogState logger;
-    
-    private List<StepInfo> stepObjects = new List<StepInfo>();
-    private int currentUnit;
+
+    private StepPipeline pipeline;
     private bool stepBegin = true;
 }
