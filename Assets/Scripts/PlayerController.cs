@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour, IStepSystem
 {
     public GameObject playerCamera;
     public float cameraHeight;
+    public Location location;
     private Cell playerCell;
 
     void Start()
@@ -15,7 +16,7 @@ public class PlayerController : MonoBehaviour, IStepSystem
         playerCamera.transform.Rotate(90, 0, 0);
     }
 
-    public StepAction Step(LogState logger, Location location)
+    public StepAction Step(LogState logger)
     {
         Vector2Int? newPos = null;
 

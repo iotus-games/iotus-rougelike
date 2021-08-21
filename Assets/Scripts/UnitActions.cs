@@ -1,48 +1,66 @@
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Actions
-{
-    Move = 0,
-    MeleeAttack = 1,
-    Heal = 2,
-}
-
-struct ActionState
-{
-    public ActionState(bool active = true, uint stepsRemain = 0)
-    {
-        Active = active;
-        StepsRemain = stepsRemain;
-    }
-
-    public bool Active;
-    public uint StepsRemain;
-}
-
 public class UnitActions : MonoBehaviour
 {
-    void Start()
+    public void Start()
     {
-        cell = GetComponent<Cell>();
+        var cp = actionObjects;
+        actionObjects = new List<Component>();
+        foreach (var component in cp)
+        {
+            AddAction(component);
+        }
     }
 
-    void Update()
+    public TComponent GetActionComponent<TComponent>(string actionName)
     {
-    }
-    
-    
-
-    public void Move(Vector2Int newPosition)
-    {
-        location.MoveObject(gameObject, cell, newPosition);
-        //state[(int) Actions.Move].StepsRemain;
+        return FindAction(actionName).gameObject.GetComponent<TComponent>();
     }
 
-    
+    public void AddAction(Component action)
+    {
+        if (!typeof(IActionSystem).IsInstanceOfType(action))
+        {
+            throw new Exception(
+                action.name + " Component '" + action.name + "' must be instance of IActionSystem");
+        }
 
-    public Location location;
-    private Cell cell;
-    private ActionState[] state = new ActionState[3];
+        if (action.gameObject.name.StartsWith(gameObject.name + "-"))
+        {
+            actionObjects.Add(action);
+        } 
+        else
+        {
+            var i = Instantiate(action.gameObject);
+            i.name = gameObject.name + "-" + action.gameObject.name;
+            actionObjects.Add(i.GetComponent(action.GetType()));
+        }
+    }
+
+    public bool CanCast(LogState logger, string actionName)
+    {
+        return ((IActionSystem) FindAction(actionName)).CanCast(logger);
+    }
+
+    public void DoCast(LogState logger, string actionName)
+    {
+        ((IActionSystem) FindAction(actionName)).DoCast(logger);
+    }
+
+    private Component FindAction(string actionName)
+    {
+        foreach (var a in actionObjects)
+        {
+            if (a.gameObject.name == gameObject.name + "-" + actionName)
+            {
+                return a;
+            }
+        }
+
+        throw new Exception("Object doesn't contains action named '" + actionName + "'");
+    }
+
+    [SerializeField] private List<Component> actionObjects;
 }

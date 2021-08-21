@@ -12,6 +12,9 @@ GameObject:
   - component: {fileID: 5786914823757064412}
   - component: {fileID: 6329594077965395011}
   - component: {fileID: 1723988146869592508}
+  - component: {fileID: -8785672450797599487}
+  - component: {fileID: 4594856459849944739}
+  - component: {fileID: -4293122486537678543}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -95,3 +98,56 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-8785672450797599487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6070056235653427683}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eb41fcfb8f149c4bc90ce09b2e2f548, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  state:
+  - res: 0
+    currentValue: 100
+    maxValue: 100
+  - res: 0
+    currentValue: 100
+    maxValue: 100
+--- !u!114 &4594856459849944739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6070056235653427683}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a66b3d2d0e0f3f4e83f719d4fac975b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  state:
+  - stat: 0
+    value: 25
+    percent: 0
+  - stat: 1
+    value: 5
+    percent: 0
+--- !u!114 &-4293122486537678543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6070056235653427683}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9e339f3c7044b94fb3c5ebc79eedcf8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerCamera: {fileID: 0}
+  cameraHeight: 7
+  location: {fileID: 0}

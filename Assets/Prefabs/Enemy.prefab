@@ -11,8 +11,11 @@ GameObject:
   - component: {fileID: 5441248925104046453}
   - component: {fileID: 4285032930371575155}
   - component: {fileID: 4390731079390482924}
+  - component: {fileID: -889029679305331812}
+  - component: {fileID: 1969397281746469850}
   - component: {fileID: 8995070497112200211}
   - component: {fileID: 4885959704234676998}
+  - component: {fileID: 4782801499757921558}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -83,6 +86,44 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-889029679305331812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4541059010116781132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4eb41fcfb8f149c4bc90ce09b2e2f548, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  state:
+  - res: 0
+    currentValue: 100
+    maxValue: 100
+  - res: 0
+    currentValue: 100
+    maxValue: 100
+--- !u!114 &1969397281746469850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4541059010116781132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a66b3d2d0e0f3f4e83f719d4fac975b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  state:
+  - stat: 0
+    value: 15
+    percent: 0
+  - stat: 1
+    value: 5
+    percent: 0
 --- !u!135 &8995070497112200211
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -108,3 +149,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5393b04bd3607e4fa2faf705dd03420, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4782801499757921558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4541059010116781132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34f059a18bbc9c6489c6b48f6721684d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetPlayer: {fileID: 0}
+  visionDistance: 4
+  location: {fileID: 0}

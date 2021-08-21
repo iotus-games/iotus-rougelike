@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class Library
 {
@@ -24,5 +25,11 @@ public class Library
         where TValue : new()
     {
         return GetOrCreate(dict, key, new TValue());
+    }
+
+    public static T GetOrAddComponent<T>(GameObject obj) where T : Component
+    {
+        var c = obj.GetComponent<T>();
+        return c == null ? obj.AddComponent<T>() : c;
     }
 }

@@ -7,18 +7,35 @@ using UnityEngine.Assertions;
 // Положительное направление по Y: низ
 public class Location : MonoBehaviour
 {
-    public float sellSize = 1;
+    private void Start()
+    {
+        if (initObjects != null)
+        {
+            foreach (var obj in initObjects)
+            {
+                AddObject(obj);
+            }
+        }
+    }
+
 
     // Добавляет объект на сетку уровня.
-    // Компонент Transform определяет положение объекта относительно центра клетки.
-    public GameObject AddObject(Vector2Int pos, GameObject prefab)
+    // Компонент Transform определяет положение объекта относительно центра клетки
+    public void AddObject(GameObject obj)
+    {
+        var pos = obj.GetComponent<Cell>().ToVec();
+        Library.GetOrCreate(cells, pos).Add(obj);
+        ToWorldCoords(new Vector2Int(), pos, obj);
+    }
+
+    public GameObject InitObject(Vector2Int pos, GameObject prefab)
     {
         var obj = Instantiate(prefab);
-        ToWorldCoords(new Vector2Int(), pos, obj);
         var cell = obj.AddComponent<Cell>();
         cell.x = pos.x;
         cell.y = pos.y;
         Library.GetOrCreate(cells, pos).Add(obj);
+        ToWorldCoords(new Vector2Int(), pos, obj);
         return obj;
     }
 
@@ -184,7 +201,7 @@ public class Location : MonoBehaviour
     public List<GameObject> Query(Vector2Int pos, Type include)
     {
         var i = new List<Type> {include};
-        var e = new List<Type> { };
+        var e = new List<Type>();
         return Query(pos, i, e);
     }
 
@@ -242,7 +259,6 @@ public class Location : MonoBehaviour
     public bool HasArea(Vector2Int leftBottom, Vector2Int rightTop, List<Type> includeComponents,
         List<Type> excludeComponents)
     {
-        var result = new List<GameObject>();
         Assert.IsTrue(leftBottom.x < rightTop.x && leftBottom.y < rightTop.y);
 
         for (var i = leftBottom.y; i <= rightTop.y; i++)
@@ -291,6 +307,8 @@ public class Location : MonoBehaviour
             gridTo.x + position.x - gridFrom.x, position.y, gridTo.y + position.z - gridFrom.y);
     }
 
-
     private Dictionary<Vector2, List<GameObject>> cells = new Dictionary<Vector2, List<GameObject>>();
+
+    public float sellSize = 1;
+    public List<GameObject> initObjects;
 }

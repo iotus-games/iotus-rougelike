@@ -1,37 +1,90 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public enum Resources
+public enum UnitResource
 {
     Health = 0,
     Stamina = 1,
 }
 
-struct ResourceInfo
+[Serializable]
+public class ResourceInfo
 {
-    public float CurrentValue;
-    public float MaxValue;
+    public UnitResource res;
+    public float currentValue;
+    public float maxValue;
 }
 
-public class UnitResources : MonoBehaviour 
+public class UnitResources : MonoBehaviour, IEnumerable
 {
-    public void AddCurrent(Resources resource, float value)
+    public void Activate(UnitResource resource, float currentValue, float maxValue)
     {
-        var res = state[(int) resource];
-        res.CurrentValue += value;
-        res.CurrentValue = Math.Max(res.CurrentValue, 0);
-        res.CurrentValue = Math.Min(res.CurrentValue, res.MaxValue);
+        if (FindResource(resource) != state.Count)
+        {
+            throw new Exception("Resource has been already activated!");
+        }
+
+
+        state.Add(new ResourceInfo {res = resource, currentValue = currentValue, maxValue = maxValue});
     }
 
-    public void AddMax(Resources resource, float value)
+    public void Deactivate(UnitResource resource)
     {
-        state[(int) resource].MaxValue += value;
+        var i = FindResourceChecked(resource);
+        state.RemoveAt(i);
     }
 
-    public float Value(Resources resource)
+    public void AddCurrent(UnitResource resource, float value)
     {
-        return state[(int) resource].CurrentValue;
+        var id = FindResourceChecked(resource);
+        var res = state[id];
+        res.currentValue += value;
+        res.currentValue = Math.Max(res.currentValue, 0);
+        res.currentValue = Math.Min(res.currentValue, res.maxValue);
     }
 
-    private ResourceInfo[] state = new ResourceInfo[2];
+    public void AddMax(UnitResource resource, float value)
+    {
+        var id = FindResourceChecked(resource);
+        state[id].maxValue += value;
+    }
+
+    public float Value(UnitResource resource)
+    {
+        var id = FindResourceChecked(resource);
+        return state[id].currentValue;
+    }
+
+    public IEnumerator GetEnumerator()
+    {
+        return state.GetEnumerator();
+    }
+
+    private int FindResource(UnitResource resource)
+    {
+        for (int i = 0; i < state.Count; i++)
+        {
+            if (state[i].res == resource)
+            {
+                return i;
+            }
+        }
+
+        return state.Count;
+    }
+
+    private int FindResourceChecked(UnitResource resource)
+    {
+        var i = FindResource(resource);
+        if (i == state.Count)
+        {
+            throw new Exception("Resource doesn't activated!");
+        }
+
+        return i;
+    }
+
+    [SerializeField] private List<ResourceInfo> state = new List<ResourceInfo>();
 }
