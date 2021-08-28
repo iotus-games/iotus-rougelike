@@ -9,16 +9,16 @@ public class SimpleAI : MonoBehaviour, IStepSystem
     public Location location;
     private Cell targetCell;
     private Cell aiCell;
-    private UnitActions aiActions;
+    private Actions.UnitActions aiActions;
 
     void Start()
     {
         targetCell = targetPlayer.GetComponent<Cell>();
         aiCell = GetComponent<Cell>();
-        aiActions = GetComponent<UnitActions>();
+        aiActions = GetComponent<Actions.UnitActions>();
     }
 
-    public StepAction Step(LogState logger)
+    public StepAction Step(UI.Logger logger)
     {
         var aiPos = aiCell.ToVec();
         var targetPos = targetCell.ToVec();
@@ -27,11 +27,7 @@ public class SimpleAI : MonoBehaviour, IStepSystem
         var yDistance = Math.Abs(aiPos.y - targetPos.y);
         if (xDistance <= visionDistance && yDistance <= visionDistance)
         {
-            if (aiActions.CanCast(logger, "Attack"))
-            {
-                aiActions.DoCast(logger, "Attack");
-            }
-            else
+            if (!aiActions.TryCast(logger, "Attack"))
             {
                 var to = BreathFirstSearchStep(location, aiPos, targetPos);
                 if (to != targetCell.ToVec())

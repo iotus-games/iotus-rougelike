@@ -17,8 +17,18 @@ public class ResourceInfo
     public float maxValue;
 }
 
+public interface IUIResourcesListener
+{
+    void OnResourceModified(int index, ResourceInfo info);
+
+    void OnResourceActivatedDeactivated();
+}
+
 public class UnitResources : MonoBehaviour, IEnumerable
 {
+    [SerializeField] private List<ResourceInfo> state = new List<ResourceInfo>();
+    public IUIResourcesListener UiListener = null;
+
     public void Activate(UnitResource resource, float currentValue, float maxValue)
     {
         if (FindResource(resource) != state.Count)
@@ -28,12 +38,14 @@ public class UnitResources : MonoBehaviour, IEnumerable
 
 
         state.Add(new ResourceInfo {res = resource, currentValue = currentValue, maxValue = maxValue});
+        UiListener?.OnResourceActivatedDeactivated();
     }
 
     public void Deactivate(UnitResource resource)
     {
         var i = FindResourceChecked(resource);
         state.RemoveAt(i);
+        UiListener?.OnResourceActivatedDeactivated();
     }
 
     public void AddCurrent(UnitResource resource, float value)
@@ -43,18 +55,26 @@ public class UnitResources : MonoBehaviour, IEnumerable
         res.currentValue += value;
         res.currentValue = Math.Max(res.currentValue, 0);
         res.currentValue = Math.Min(res.currentValue, res.maxValue);
+        UiListener?.OnResourceModified(id, res);
     }
 
     public void AddMax(UnitResource resource, float value)
     {
         var id = FindResourceChecked(resource);
         state[id].maxValue += value;
+        UiListener?.OnResourceModified(id, state[id]);
     }
 
-    public float Value(UnitResource resource)
+    public float Current(UnitResource resource)
     {
         var id = FindResourceChecked(resource);
         return state[id].currentValue;
+    }
+
+    public float Max(UnitResource resource)
+    {
+        var id = FindResourceChecked(resource);
+        return state[id].maxValue;
     }
 
     public IEnumerator GetEnumerator()
@@ -85,6 +105,4 @@ public class UnitResources : MonoBehaviour, IEnumerable
 
         return i;
     }
-
-    [SerializeField] private List<ResourceInfo> state = new List<ResourceInfo>();
 }

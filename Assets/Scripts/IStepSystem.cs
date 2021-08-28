@@ -8,5 +8,5 @@
 // Интерфейс, необходимый реализовать для любого объекта, что может ходить
 public interface IStepSystem
 {
-    StepAction Step(LogState logger);
+    StepAction Step(UI.Logger logger);
 }

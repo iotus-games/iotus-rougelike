@@ -5,7 +5,7 @@ public class StepState : StepPipeline
     {
         if (stepBegin)
         {
-            logger.Message("Step unit: " + CurrentStepObject().name, MessageType.Step);
+            logger.Message("Step unit: " + CurrentStepObject().name, UI.MessageType.Step);
             stepBegin = false;
         }
 
@@ -17,6 +17,6 @@ public class StepState : StepPipeline
         }
     }
 
-    public LogState logger;
+    public UI.Logger logger;
     private bool stepBegin = true;
 }

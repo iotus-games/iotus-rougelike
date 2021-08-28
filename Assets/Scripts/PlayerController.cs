@@ -1,3 +1,4 @@
+using Actions;
 using UnityEngine;
 
 // Считывает команды игрока для осуществления хода
@@ -6,17 +7,21 @@ public class PlayerController : MonoBehaviour, IStepSystem
     public GameObject playerCamera;
     public float cameraHeight;
     public Location location;
+
     private Cell playerCell;
+    private UnitActions unitActions;
 
     void Start()
     {
         playerCell = GetComponent<Cell>();
+        unitActions = GetComponent<UnitActions>();
+
         var pos = transform.position;
         playerCamera.transform.position = new Vector3(pos.x, cameraHeight, pos.z);
         playerCamera.transform.Rotate(90, 0, 0);
     }
 
-    public StepAction Step(LogState logger)
+    public StepAction Step(UI.Logger logger)
     {
         Vector2Int? newPos = null;
 
@@ -62,20 +67,14 @@ public class PlayerController : MonoBehaviour, IStepSystem
             return StepAction.Wait;
         }
 
-        if (location.Has(newPos.Value, typeof(ObstacleTag)))
+        var action = unitActions.GetActionComponent<Move>("Move");
+        action.position = newPos.Value;
+
+        if (!unitActions.TryCast(logger, "Move"))
         {
-            logger.Message("Can't move, obstacle at " + newPos.Value, MessageType.Error);
             return StepAction.Wait;
         }
-
-        if (!location.Has(newPos.Value, typeof(GroundTag)))
-        {
-            logger.Message("Can't move, no ground at " + newPos.Value, MessageType.Error);
-            return StepAction.Wait;
-        }
-
-        location.MoveObject(gameObject, playerCell, newPos.Value);
-
+       
         var pos = transform.position;
         playerCamera.transform.position = new Vector3(pos.x, cameraHeight, pos.z);
 

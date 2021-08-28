@@ -5,10 +5,10 @@ public class StepPipeline : Pipeline, IStepSystem
 {
     public StepPipeline()
     {
-        ComponentBaseType = typeof(IStepSystem);
+        componentBaseType = typeof(IStepSystem);
     }
 
-    public StepAction Step(LogState logger)
+    public StepAction Step(UI.Logger logger)
     {
         if (systems.Count == 0)
         {

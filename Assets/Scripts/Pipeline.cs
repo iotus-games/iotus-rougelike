@@ -10,9 +10,12 @@ public class Pipeline : MonoBehaviour, IEnumerable
     {
         if (autoInitComponents)
         {
-            foreach (var c in GetComponents(ComponentBaseType))
+            foreach (var c in GetComponents(componentBaseType))
             {
-                AddSystem(c);
+                if (c != this)
+                {
+                    AddSystem(c);
+                }
             }
         }
     }
@@ -26,10 +29,10 @@ public class Pipeline : MonoBehaviour, IEnumerable
 
     public void AddSystem(Component c)
     {
-        if (!ComponentBaseType.IsInstanceOfType(c))
+        if (!componentBaseType.IsInstanceOfType(c))
         {
             throw new Exception(
-                "Component '" + c.name + "' must be instance of " + ComponentBaseType.Name);
+                "Component '" + c.name + "' must be instance of " + componentBaseType.Name);
         }
 
         systems.Add(c);
@@ -44,7 +47,7 @@ public class Pipeline : MonoBehaviour, IEnumerable
     {
         foreach (var s in systems)
         {
-            yield return s.gameObject;
+            yield return s;
         }
     }
 
@@ -57,7 +60,7 @@ public class Pipeline : MonoBehaviour, IEnumerable
     }
 
     [SerializeField] protected List<Component> systems = new List<Component>();
-    protected Type ComponentBaseType;
+    protected Type componentBaseType;
 
     // Автоматически добавить в конвеер все комоненты, наследующиеся от IStepSystem
     public bool autoInitComponents;
