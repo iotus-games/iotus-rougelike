@@ -307,7 +307,7 @@ public class Location : MonoBehaviour
             gridTo.x + position.x - gridFrom.x, position.y, gridTo.y + position.z - gridFrom.y);
     }
 
-    private Dictionary<Vector2, List<GameObject>> cells = new Dictionary<Vector2, List<GameObject>>();
+    private Dictionary<Vector2Int, List<GameObject>> cells = new Dictionary<Vector2Int, List<GameObject>>();
 
     public float sellSize = 1;
     public List<GameObject> initObjects;

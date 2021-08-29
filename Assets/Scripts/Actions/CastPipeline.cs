@@ -1,8 +1,9 @@
 using UnityEngine;
+using Steps;
 
 namespace Actions
 {
-    public class CastPipeline : Pipeline, IActionSystem
+    public class CastPipeline : StepPipeline, IActionSystem
     {
         private GameObject caller;
 
@@ -37,14 +38,6 @@ namespace Actions
             }
 
             return true;
-        }
-
-        public void DoCast(UI.Logger logger)
-        {
-            foreach (IActionSystem a in this)
-            {
-                a.DoCast(logger);
-            }
         }
     }
 }

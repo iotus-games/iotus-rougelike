@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Steps;
 
 namespace Actions
 {
     public class UnitActions : MonoBehaviour
     {
+        public List<GameObject> initObjects;
+        private List<CastPipeline> actionObjects = new List<CastPipeline>();
+
         public void Start()
         {
             foreach (var obj in initObjects)
@@ -30,13 +34,7 @@ namespace Actions
                 obj.name = gameObject.name + "-" + objName;
             }
 
-            var pipeline = obj.GetComponent<CastPipeline>();
-            if (pipeline == null)
-            {
-                pipeline = obj.AddComponent<CastPipeline>();
-                pipeline.autoInitComponents = true;
-            }
-
+            var pipeline = Pipeline.InitFromObject<CastPipeline>(obj);
             pipeline.Prepare(gameObject);
             actionObjects.Add(pipeline);
         }
@@ -46,16 +44,27 @@ namespace Actions
             return FindAction(actionName).CanCast(logger);
         }
 
-        public void DoCast(UI.Logger logger, string actionName)
+        public void Cast(string actionName, GameObject caller)
         {
-            FindAction(actionName).DoCast(logger);
+            var action = FindAction(actionName);
+            var tmp = action.gameObject.AddComponent<TemporaryStep>();
+            tmp.stepsRemain = 1;
+            tmp.system = action;
+
+            var pipeline = caller.GetComponent<StepPipeline>();
+            pipeline.AddSystemAfterCurrent(tmp);
+        }
+
+        public void Cast(string actionName)
+        {
+            Cast(actionName, gameObject);
         }
 
         public bool TryCast(UI.Logger logger, string actionName)
         {
             if (CanCast(logger, actionName))
             {
-                DoCast(logger, actionName);
+                Cast(actionName);
                 return true;
             }
 
@@ -74,9 +83,5 @@ namespace Actions
 
             throw new Exception(gameObject.name + " doesn't contains action named '" + actionName + "'");
         }
-
-
-        public List<GameObject> initObjects;
-        private List<CastPipeline> actionObjects = new List<CastPipeline>();
     }
 }

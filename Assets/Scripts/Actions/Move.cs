@@ -1,3 +1,4 @@
+using Steps;
 using UnityEngine;
 
 namespace Actions
@@ -31,9 +32,10 @@ namespace Actions
             return true;
         }
 
-        public void DoCast(UI.Logger logger)
+        public StepAction Step(UI.Logger logger)
         {
             location.MoveObject(playerCell.gameObject, playerCell, position);
+            return StepAction.Continue;
         }
     }
 }

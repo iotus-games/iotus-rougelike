@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
+using Steps;
 
 namespace Actions
 {
-    public interface IActionSystem
+    public interface IActionSystem : IStepSystem
     {
         public void Prepare(GameObject caller);
         
         public bool CanCast(UI.Logger logger);
-
-        public void DoCast(UI.Logger logger);
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
+using Steps;
 
 // Базовая фунциональность для всех классов-конвейеров
 public class Pipeline : MonoBehaviour, IEnumerable
@@ -20,6 +21,18 @@ public class Pipeline : MonoBehaviour, IEnumerable
         }
     }
 
+    public static T InitFromObject<T>(GameObject obj) where T : Pipeline
+    {
+        var pipeline = obj.GetComponent<T>();
+        if (pipeline == null)
+        {
+            pipeline = obj.AddComponent<T>();
+            pipeline.autoInitComponents = true;
+        }
+
+        return pipeline;
+    }
+
     public T InitSystem<T>(GameObject obj) where T : Component, IStepSystem
     {
         var c = Library.GetOrAddComponent<T>(obj);
@@ -29,13 +42,18 @@ public class Pipeline : MonoBehaviour, IEnumerable
 
     public void AddSystem(Component c)
     {
+        AddSystem(c, systems.Count);
+    }
+
+    public void AddSystem(Component c, int index)
+    {
         if (!componentBaseType.IsInstanceOfType(c))
         {
             throw new Exception(
                 "Component '" + c.name + "' must be instance of " + componentBaseType.Name);
         }
 
-        systems.Add(c);
+        systems.Insert(index, c);
     }
 
     public void RemoveSystem<T>(GameObject obj) where T : IStepSystem
@@ -53,10 +71,7 @@ public class Pipeline : MonoBehaviour, IEnumerable
 
     public void RemoveSystem(Component component)
     {
-        if (systems.Remove(component))
-        {
-            Destroy(component);
-        }
+        systems.Remove(component);
     }
 
     [SerializeField] protected List<Component> systems = new List<Component>();

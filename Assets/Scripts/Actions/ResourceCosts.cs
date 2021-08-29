@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Steps;
 using UnityEngine;
 
 namespace Actions
@@ -35,12 +36,14 @@ namespace Actions
             return true;
         }
 
-        public void DoCast(UI.Logger logger)
+        public StepAction Step(UI.Logger logger)
         {
             foreach (var cost in resourceCosts)
             {
                 unitResources.AddCurrent(cost.res, -cost.val);
             }
+
+            return StepAction.Continue;
         }
 
         public void SetCost(UnitResource res, float val)
